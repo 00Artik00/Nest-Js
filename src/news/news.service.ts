@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Str } from "@supercharge/strings"
+import { Str } from "@supercharge/strings";
+import { Comment } from './comments/comments.service';
 export interface News {
     id?: string,
     title: string,
     description: string,
     author: string,
     countView?: number,
-    date?: string
+    date?: string,
+    comments?: Comment[],
+    cover?: string
 }
 @Injectable()
 export class NewsService {
@@ -17,6 +20,7 @@ export class NewsService {
             description: "some descr about first news",
             author: "Author 1",
             countView: 12,
+            cover: "https://sun9-70.userapi.com/sun9-14/impg/1P9R0wT2lsZc2iMes9019B1MDZ5De52JPtl2VA/WlqeX6C2snQ.jpg?size=1280x854&quality=95&sign=d55ff75b59a9887d3abe21ba3c3192e7&c_uniq_tag=EFoN7xgNck93MrAZ9Qkbm_IBk7Y792dl3G1iTk4zasM&type=album"
         }
     ];
     getAll() {

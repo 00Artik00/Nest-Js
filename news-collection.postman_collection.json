@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "aaa05b2e-667e-47e4-b2d2-4f72b7334a07",
+		"name": "news-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25272097"
+	},
+	"item": [
+		{
+			"name": "Создание новости",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"news 15\",\r\n    \"description\": \"another one news\",\r\n    \"author\": \"Author 2\",\r\n    \"countView\": 26,\r\n    \"cover\": \"https://w-dog.ru/wallpapers/5/15/298910243035071/pushistyj-malysh-cvety-venok.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/news/api",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"news",
+						"api"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление новости",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/news/api/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"news",
+						"api",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Изменение новости",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"news 27\",\r\n    \"description\": \"adasdaswafa\",\r\n    \"author\": \"Author 2\",\r\n    \"countView\": 26,\r\n    \"id\": \"BK70W5-Zjx\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/news/api",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"news",
+						"api"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение новости по id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/news/api/randomId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"news",
+						"api",
+						"randomId"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение списка новостей",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/news/api/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"news",
+						"api",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Добавить коментарий",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"message\": \"Привет\",\r\n    \"author\": \"Artemka\",\r\n    \"idNews\": \"T-olNtP4xC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/comments/api",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"comments",
+						"api"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удалить коментарий",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/comments/api/randomId/NKdGaFk5E5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"comments",
+						"api",
+						"randomId",
+						"NKdGaFk5E5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Изменение коммента",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idNews\": \"randomId\",\r\n    \"id\": \"GYQmyEDmfk\",\r\n   \"message\": \"changed comment\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/comments/api/changeComment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"comments",
+						"api",
+						"changeComment"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
