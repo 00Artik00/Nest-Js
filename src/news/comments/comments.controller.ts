@@ -1,15 +1,42 @@
-import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { CreateCommentsDto } from '../dto/create.comments.dto';
 import { CommentsService, Comment } from './comments.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { HelperFileLoad } from 'src/utils/helperFileLoader';
+const PATH_COMMENTS = "/static/";
 
 @Controller('comments')
 export class CommentsController {
     constructor(private readonly commentsService: CommentsService) {}
     @Post("/api")
-    create(@Body() comment: Comment) {
+    @UseInterceptors(
+        FileInterceptor('cover', {
+            storage: diskStorage({
+                destination: HelperFileLoad.destinationPath,
+                filename: HelperFileLoad.customFileName
+            })
+        })
+    )
+    create(@Body() comment: CreateCommentsDto, @UploadedFile() cover: Express.Multer.File) {
+        if (cover?.filename) {
+            comment.cover = PATH_COMMENTS + cover.filename;
+        }
         this.commentsService.create(comment)
     }
     @Post("/api/changeComment")
-    change(@Body() comment: Comment) {
+    @UseInterceptors(
+        FileInterceptor('cover', {
+            storage: diskStorage({
+                destination: HelperFileLoad.destinationPath,
+                filename: HelperFileLoad.customFileName
+            })
+        })
+    )
+    change(@Body() comment: CreateCommentsDto, @UploadedFile() cover: Express.Multer.File) {
+        if (cover?.filename) {
+            comment.cover = PATH_COMMENTS + cover.filename;
+        }
         this.commentsService.change(comment)
     }
     @Get('/api/:id')

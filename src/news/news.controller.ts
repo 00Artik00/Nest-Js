@@ -1,9 +1,16 @@
-import { Body, Controller, Get, Param, Post, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { News, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
 import { renderNewsAll } from 'src/views/news/news-all';
 import { renderTemplate } from 'src/views/template';
 import { renderNewsOne } from 'src/views/news/news-one';
+import { CreateNewsDto } from './dto/create.news.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { HelperFileLoad } from 'src/utils/helperFileLoader';
+
+const PATH_NEWS = "/static/";
+HelperFileLoad.path = PATH_NEWS;
 
 @Controller('news')
 export class NewsController {
@@ -18,7 +25,7 @@ export class NewsController {
     getDetail(@Param('id') id: string) {
         const news = this.newService.find(id);
         const comments = this.commentsService.find(id);
-        return renderTemplate(renderNewsOne(news, comments), { title: "Новость", description: "Страница новости" });
+        return renderTemplate(renderNewsOne(news, comments), { title: news.title, description: news.description });
     }
     @Get('/api/all')
     getAllNews(@Param('id') id: string): News[] {
@@ -33,7 +40,18 @@ export class NewsController {
     }
 
     @Post("/api")
-    createOrChange(@Body() news: News) {
+    @UseInterceptors(
+        FileInterceptor('cover', {
+            storage: diskStorage({
+                destination: HelperFileLoad.destinationPath,
+                filename: HelperFileLoad.customFileName
+            })
+        })
+    )
+    createOrChange(@Body() news: CreateNewsDto, @UploadedFile() cover: Express.Multer.File) {
+        if (cover?.filename) {
+            news.cover = PATH_NEWS + cover.filename;
+        }
         this.newService.createOrChange(news);
     }
 

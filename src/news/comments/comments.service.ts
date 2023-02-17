@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Str } from '@supercharge/strings/dist';
 export type Comment = {
-    id: string,
+    id?: string,
     message: string,
     author: string,
     idNews: string,
-    date?: Date
+    date?: Date,
+    cover?: string
 }
 @Injectable()
 export class CommentsService {

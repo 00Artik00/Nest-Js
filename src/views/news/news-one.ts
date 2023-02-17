@@ -4,7 +4,11 @@ function renderAllComments(comments: Comment[]) {
     let commentsHtmlList = "";
     if (comments) {
         for (const com of comments) {
-            commentsHtmlList += `<li>${com.author}: ${com.message} (${com.date.toISOString()})</li>`
+            commentsHtmlList += `
+            <li>
+            ${com.cover ? `<img src="${com.cover}" style="height:30px;width: 30px; object-fit:cover" class="card-img-top" alt="...">` : ''}
+            ${com.author}: ${com.message} (${com.date.toISOString()})
+            </li>`
         }
     }
     return commentsHtmlList;
