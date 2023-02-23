@@ -1,0 +1,25 @@
+{{#if news}}
+<div class="card" style="cursor: pointer;">
+    <img src='{{news.cover}}' class="card-img-top" style="height: 500px; object-fit: cover;" alt=''>
+    <div class="card-body">
+        <h5 class="card-title">{{news.title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Автор: {{news.author}}</h6>
+        <p class="card-text">{{news.description}}</p>
+    </div>
+</div>
+{{else}}
+<h1>Данной новости не существует</h1>
+{{/if}}
+<h1>Список Коментариев</h1>
+{{#if comments}}
+{{#each comments}}
+<li>
+    {{#if this.cover}}
+    <img src="{{this.cover}}" width="25px" height="25px" alt="">
+    {{/if}}
+    {{this.author}}: {{this.message}}
+</li>
+{{/each}}
+{{else}}
+<p>Коментарии отсутствуют</p>
+{{/if}}

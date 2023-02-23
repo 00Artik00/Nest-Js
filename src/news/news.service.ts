@@ -11,6 +11,10 @@ export interface News {
     comments?: Comment[],
     cover?: string
 }
+export interface CreateOrChange {
+    type: 'create' | 'change',
+    news: News
+}
 @Injectable()
 export class NewsService {
     private readonly news: News[] = [
@@ -20,16 +24,17 @@ export class NewsService {
             description: "some descr about first news",
             author: "Author 1",
             countView: 12,
-            cover: "https://sun9-70.userapi.com/sun9-14/impg/1P9R0wT2lsZc2iMes9019B1MDZ5De52JPtl2VA/WlqeX6C2snQ.jpg?size=1280x854&quality=95&sign=d55ff75b59a9887d3abe21ba3c3192e7&c_uniq_tag=EFoN7xgNck93MrAZ9Qkbm_IBk7Y792dl3G1iTk4zasM&type=album"
+            cover: "https://chudo-prirody.com/uploads/posts/2021-08/1628904992_30-p-skachat-foto-milikh-kotikov-34.jpg"
         }
     ];
     getAll() {
         return this.news;
     }
-    create(news: News) {
+    create(news: News): News {
         const randomId = `${Str.random(10)}`;
         const date = new Date().toString()
         this.news.push({ ...news, id: randomId, date: date });
+        return this.find(randomId);
     }
     find(id: News['id']): News | undefined {
         return this.news.find(el => el.id === id)
@@ -42,23 +47,23 @@ export class NewsService {
         }
         return false
     }
-    change(news: News): string {
+    change(news: News): News {
         const indexChange = this.news.findIndex(el => el.id == news.id);
 
         if (indexChange !== -1) {
             const date = new Date().toString()
             console.log(indexChange);
             this.news[indexChange] = { ...news, date: date };
-            return 'Новость успешно изменена'
-        } else {
-            return 'По данному идентификатору новость не найдена'
+            return this.news[indexChange]
         }
     }
-    createOrChange(news: News) {
+    createOrChange(news: News): CreateOrChange {
         if (this.news.find(el => el.id == news.id)) {
-            this.change(news);
+            const changedNews = this.change(news);
+            return { type: 'change', news: changedNews }
         } else {
-            this.create(news);
+            const createdNews = this.create(news);
+            return { type: 'create', news: createdNews }
         }
     }
 }

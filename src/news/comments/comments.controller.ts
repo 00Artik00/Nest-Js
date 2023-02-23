@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, UploadedFile, UseInterceptors, Render } from '@nestjs/common';
 import { CreateCommentsDto } from '../dto/create.comments.dto';
 import { CommentsService, Comment } from './comments.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -47,5 +47,10 @@ export class CommentsController {
     delete(@Param('idNews') idNews: string, @Param('idComents') idComents: string): string {
         const isDel = this.commentsService.remove(idNews, idComents);
         return isDel ? "Коментарий удален" : "Передан неверный идентификатор"
+    }
+    @Get('/create/comment')
+    @Render('create-comments')
+    async createView() {
+        return {}
     }
 }
