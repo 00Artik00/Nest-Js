@@ -1,69 +1,73 @@
 import { Injectable } from '@nestjs/common';
-import { Str } from "@supercharge/strings";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Comment } from './comments/comments.service';
+import { NewsEntity } from './news.entity';
+import { CreateNewsDto } from './dtos/create-news-dto';
+import { UsersService } from '../users/users.service';
+
 export interface News {
-    id?: string,
-    title: string,
-    description: string,
-    author: string,
-    countView?: number,
-    date?: string,
-    comments?: Comment[],
-    cover?: string
+  id?: number;
+  title: string;
+  description: string;
+  author: string;
+  countView?: number;
+  cover?: string;
+  comments?: Comment[];
 }
-export interface CreateOrChange {
-    type: 'create' | 'change',
-    news: News
+
+export interface NewsEdit {
+  title?: string;
+  description?: string;
+  author?: string;
+  countView?: number;
+  cover?: string;
 }
+
 @Injectable()
 export class NewsService {
-    private readonly news: News[] = [
-        {
-            id: "randomId",
-            title: "news 1",
-            description: "some descr about first news",
-            author: "Author 1",
-            countView: 12,
-            cover: "https://chudo-prirody.com/uploads/posts/2021-08/1628904992_30-p-skachat-foto-milikh-kotikov-34.jpg"
-        }
-    ];
-    getAll() {
-        return this.news;
-    }
-    create(news: News): News {
-        const randomId = `${Str.random(10)}`;
-        const date = new Date().toString()
-        this.news.push({ ...news, id: randomId, date: date });
-        return this.find(randomId);
-    }
-    find(id: News['id']): News | undefined {
-        return this.news.find(el => el.id === id)
-    }
-    remove(id: News['id']): boolean {
-        const indexRemove = this.news.findIndex(el => el.id === id);
-        if (indexRemove !== -1) {
-            this.news.splice(indexRemove, 1);
-            return true
-        }
-        return false
-    }
-    change(news: News): News {
-        const indexChange = this.news.findIndex(el => el.id == news.id);
+  constructor(
+    @InjectRepository(NewsEntity)
+    private newsRepository: Repository<NewsEntity>,
+    private usersService: UsersService,
+  ) {}
 
-        if (indexChange !== -1) {
-            const date = new Date().toString()
-            console.log(indexChange);
-            this.news[indexChange] = { ...news, date: date };
-            return this.news[indexChange]
-        }
+  async create(news: CreateNewsDto): Promise<NewsEntity> {
+    const newsEntity = new NewsEntity();
+    newsEntity.title = news.title;
+    newsEntity.description = news.description;
+    newsEntity.cover = news.cover;
+    const _user = await this.usersService.findById(parseInt(news.userId));
+    newsEntity.user = _user;
+    return this.newsRepository.save(newsEntity);
+  }
+
+  findById(id: News['id']): Promise<NewsEntity> {
+    return this.newsRepository.findOne({ id }, { relations: ['user'] });
+  }
+
+  getAll(): Promise<NewsEntity[]> {
+    return this.newsRepository.find({});
+  }
+
+  async edit(id: number, news: NewsEdit): Promise<NewsEntity | null> {
+    const editableNews = await this.findById(id);
+    if (editableNews) {
+      const newsEntity = new NewsEntity();
+      newsEntity.title = news.title || editableNews.title;
+      newsEntity.description = news.description || editableNews.description;
+      newsEntity.cover = news.cover || editableNews.cover;
+
+      return this.newsRepository.save(newsEntity);
     }
-    createOrChange(news: News): CreateOrChange {
-        if (this.news.find(el => el.id == news.id)) {
-            const changedNews = this.change(news);
-            return { type: 'change', news: changedNews }
-        } else {
-            const createdNews = this.create(news);
-            return { type: 'create', news: createdNews }
-        }
+    return null;
+  }
+
+  async remove(id): Promise<NewsEntity | null> {
+    const removeNews = await this.findById(id);
+    if (removeNews) {
+      return this.newsRepository.remove(removeNews);
     }
+    return null;
+  }
 }

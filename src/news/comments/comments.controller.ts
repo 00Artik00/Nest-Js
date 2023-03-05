@@ -1,56 +1,73 @@
-import { Controller, Post, Body, Get, Param, Delete, UploadedFile, UseInterceptors, Render } from '@nestjs/common';
-import { CreateCommentsDto } from '../dto/create.comments.dto';
-import { CommentsService, Comment } from './comments.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  Controller,
+  Post,
+  Param,
+  Body,
+  Get,
+  Delete,
+  Put,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { diskStorage } from 'multer';
-import { HelperFileLoad } from 'src/utils/helperFileLoader';
-const PATH_COMMENTS = "/static/";
+import { CommentsService } from './comments.service';
+import { CreateCommentDto } from './dtos/create-comment-dto';
+import { EditCommentDto } from './dtos/edit-comment-dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { HelperFileLoader } from '../../utils/HelperFileLoader';
+
+const PATH_NEWS = '/news-static/';
+HelperFileLoader.path = PATH_NEWS;
 
 @Controller('comments')
 export class CommentsController {
-    constructor(private readonly commentsService: CommentsService) {}
-    @Post("/api")
-    @UseInterceptors(
-        FileInterceptor('cover', {
-            storage: diskStorage({
-                destination: HelperFileLoad.destinationPath,
-                filename: HelperFileLoad.customFileName
-            })
-        })
-    )
-    create(@Body() comment: CreateCommentsDto, @UploadedFile() cover: Express.Multer.File) {
-        if (cover?.filename) {
-            comment.cover = PATH_COMMENTS + cover.filename;
-        }
-        this.commentsService.create(comment)
+  constructor(private readonly commentsService: CommentsService) {}
+
+  @Post('/api/:idNews')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
+  create(
+    @Param('idNews') idNews: string,
+    @Body() comment: CreateCommentDto,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    if (avatar?.filename) {
+      comment.avatar = PATH_NEWS + avatar.filename;
     }
-    @Post("/api/changeComment")
-    @UseInterceptors(
-        FileInterceptor('cover', {
-            storage: diskStorage({
-                destination: HelperFileLoad.destinationPath,
-                filename: HelperFileLoad.customFileName
-            })
-        })
-    )
-    change(@Body() comment: CreateCommentsDto, @UploadedFile() cover: Express.Multer.File) {
-        if (cover?.filename) {
-            comment.cover = PATH_COMMENTS + cover.filename;
-        }
-        this.commentsService.change(comment)
-    }
-    @Get('/api/:id')
-    getOneNews(@Param('id') id: string): Comment[] {
-        return this.commentsService.find(id);
-    }
-    @Delete('/api/:idNews/:idComents')
-    delete(@Param('idNews') idNews: string, @Param('idComents') idComents: string): string {
-        const isDel = this.commentsService.remove(idNews, idComents);
-        return isDel ? "Коментарий удален" : "Передан неверный идентификатор"
-    }
-    @Get('/create/comment')
-    @Render('create-comments')
-    async createView() {
-        return {}
-    }
+    const idNewsInt = parseInt(idNews);
+    return this.commentsService.create(idNewsInt, comment);
+  }
+
+  @Put('/api/:idNews/:idComment')
+  edit(
+    @Param('idNews') idNews: string,
+    @Param('idComment') idComment: string,
+    @Body() comment: EditCommentDto,
+  ) {
+    const idNewsInt = parseInt(idNews);
+    const idCommentInt = parseInt(idComment);
+    return this.commentsService.edit(idNewsInt, idCommentInt, comment);
+  }
+
+  @Get('/api/details/:idNews')
+  get(@Param('idNews') idNews: string) {
+    const idNewsInt = parseInt(idNews);
+    return this.commentsService.find(idNewsInt);
+  }
+
+  @Delete('/api/details/:idNews/:idComment')
+  remove(
+    @Param('idNews') idNews: string,
+    @Param('idComment') idComment: string,
+  ) {
+    const idNewsInt = parseInt(idNews);
+    const idCommentInt = parseInt(idComment);
+    return this.commentsService.remove(idNewsInt, idCommentInt);
+  }
 }

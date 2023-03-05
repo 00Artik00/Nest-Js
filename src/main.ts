@@ -1,16 +1,17 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import * as expressHbs from 'express-handlebars';
-import { AppModule } from './app.module';
-import * as hbs from 'hbs';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import * as expressHbs from 'express-handlebars';
+import * as hbs from 'hbs';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
 
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
+
   app.engine(
     'hbs',
     expressHbs({
@@ -20,10 +21,7 @@ async function bootstrap() {
     }),
   );
   hbs.registerPartials(__dirname + '/views/partials');
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true
-  }));
+  app.setViewEngine('hbs');
   await app.listen(3000);
 }
 bootstrap();

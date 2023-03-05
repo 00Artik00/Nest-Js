@@ -9,9 +9,9 @@ import { MailController } from './mail.controller';
   imports: [
     MailerModule.forRoot({
       transport:
-        'smtps://artem_laptenko@mail.ru:xRrD8jFjC5x6Wtb7Yizh@smtp.mail.ru',
+        'smtps://email:pass@smtp.mail.ru',
       defaults: {
-        from: '"NestJS робот" <artem_laptenko@mail.ru>',
+        from: '"NestJS робот" <nestjs-news-blog@mail.ru>',
       },
       template: {
         dir: join(__dirname, 'templates'),
@@ -22,7 +22,6 @@ import { MailController } from './mail.controller';
       },
     }),
   ],
-
   exports: [MailService],
   providers: [MailService],
   controllers: [MailController],

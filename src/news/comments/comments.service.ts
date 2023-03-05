@@ -1,49 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { Str } from '@supercharge/strings/dist';
+import { CreateCommentDto } from './dtos/create-comment-dto';
+
 export type Comment = {
-    id?: string,
-    message: string,
-    author: string,
-    idNews: string,
-    date?: Date,
-    cover?: string
-}
+  id?: number;
+  message: string;
+  author: string;
+};
+
+export type CommentEdit = {
+  id?: number;
+  message?: string;
+  author?: string;
+};
+
 @Injectable()
 export class CommentsService {
-    private readonly comments = {};
+  private readonly comments = {};
 
-    create(comment: Comment) {
-        if (!this.comments[comment.idNews]) {
-            this.comments[comment.idNews] = [];
-        }
-        const randomId = Str.random(10);
-        const date = new Date();
-        this.comments[comment.idNews].push({ ...comment, id: randomId, date: date });
+  create(idNews: number, comment: CreateCommentDto) {
+    if (!this.comments[idNews]) {
+      this.comments[idNews] = [];
     }
-    find(idNews: string): Comment[] | undefined {
-        return this.comments[idNews]
+
+    const newComment = { ...comment, id: 1 };
+    this.comments[idNews].push(newComment);
+    return newComment;
+  }
+
+  edit(idNews: number, idComment: number, comment: CommentEdit) {
+    const indexComment = this.comments[idNews]?.findIndex(
+      (c) => c.id === idComment,
+    );
+
+    if (!this.comments[idNews] || indexComment === -1) {
+      return false;
     }
-    remove(idNews: Comment['idNews'], idComents: Comment['id']): boolean {
-        if (!this.comments[idNews]) {
-            return false
-        }
-        const indexRemove = this.comments[idNews].findIndex(el => el.id === idComents);
-        if (indexRemove !== -1) {
-            this.comments[idNews].splice(indexRemove, 1);
-            return true
-        }
-        return false
+
+    this.comments[idNews][indexComment] = {
+      ...this.comments[idNews][indexComment],
+      ...comment,
+    };
+    return this.comments[idNews][indexComment];
+  }
+
+  find(idNews: number): CreateCommentDto[] | null {
+    return this.comments[idNews] || null;
+  }
+
+  remove(idNews: number, idComment: number): Comment[] | null {
+    if (!this.comments[idNews]) {
+      return null;
     }
-    change(comment: Comment) {
-        let arrComment: Comment[] | undefined = this.comments[comment.idNews];
-        let indexChange = null;
-        if (arrComment) {
-            indexChange = arrComment.findIndex(el => el.id === comment.id);
-        }
-        if (arrComment && indexChange !== -1) {
-            const oldComment = this.comments[comment.idNews][indexChange];
-            const date = new Date();
-            this.comments[comment.idNews][indexChange] = { ...oldComment, date: date, message: comment.message }
-        }
+
+    const indexComment = this.comments[idNews].findIndex(
+      (c) => c.id === idComment,
+    );
+    if (indexComment === -1) {
+      return null;
     }
+    return this.comments[idNews].splice(indexComment, 1);
+  }
 }
